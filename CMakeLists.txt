@@ -116,6 +116,13 @@ xoption(BUILD_EXAMPLES "Build examples" OFF)
 xoption(BUILD_STATIC_QJS_EXE "Build a static qjs executable" OFF)
 xoption(BUILD_CLI_WITH_MIMALLOC "Build the qjs executable with mimalloc" OFF)
 xoption(BUILD_CLI_WITH_STATIC_MIMALLOC "Build the qjs executable with mimalloc (statically linked)" OFF)
+xoption(BUILD_QJSC "Build qjsc executable" OFF)
+xoption(BUILD_QJS "Build qjs executable" OFF)
+xoption(BUILD_UNICODE_GEN "Build unicode_gen executable" OFF)
+xoption(BUILD_FUNCTION_SOURCE "Build function_source executable" OFF)
+xoption(BUILD_TEST_262 "Build TEST_262 executable" OFF)
+xoption(BUILD_TEST_CON "Build TEST_CON executable" OFF)
+
 xoption(CONFIG_ASAN "Enable AddressSanitizer (ASan)" OFF)
 xoption(CONFIG_MSAN "Enable MemorySanitizer (MSan)" OFF)
 xoption(CONFIG_TSAN "Enable ThreadSanitizer (TSan)" OFF)
@@ -187,7 +194,7 @@ endif()
 # QuickJS library
 #
 
-xoption(BUILD_QJS_LIBC "Build standard library modules as part of the library" OFF)
+xoption(BUILD_QJS_LIBC "Build standard library modules as part of the library" ON)
 macro(add_qjs_libc_if_needed target)
     if(NOT BUILD_QJS_LIBC)
         target_sources(${target} PRIVATE quickjs-libc.c)
@@ -248,17 +255,20 @@ endif()
 # QuickJS bytecode compiler
 #
 
+if(BUILD_QJSC)
 add_executable(qjsc
     qjsc.c
 )
 add_qjs_libc_if_needed(qjsc)
 target_compile_definitions(qjsc PRIVATE ${qjs_defines})
 target_link_libraries(qjsc qjs)
+endif()
 
 
 # QuickJS CLI
 #
 
+if(BUILD_QJS)
 add_executable(qjs_exe
     gen/repl.c
     qjs.c
@@ -287,10 +297,12 @@ if(BUILD_CLI_WITH_MIMALLOC OR BUILD_CLI_WITH_STATIC_MIMALLOC)
         target_link_libraries(qjs_exe mimalloc)
     endif()
 endif()
+endif()
 
 # Test262 runner
 #
 
+if(BUILD_TEST_262)
 if(EMSCRIPTEN
 OR CMAKE_C_COMPILER_ID STREQUAL "TinyCC"
 OR (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_C_COMPILER_VERSION VERSION_LESS 5))
@@ -306,17 +318,21 @@ else()
     target_compile_definitions(run-test262 PRIVATE ${qjs_defines})
     target_link_libraries(run-test262 qjs)
 endif()
+endif()
 
 # Unicode generator
 #
 
+if(BUILD_UNICODE_GEN)
 add_executable(unicode_gen EXCLUDE_FROM_ALL
     cutils.c
     libunicode.c
     unicode_gen.c
 )
 target_compile_definitions(unicode_gen PRIVATE ${qjs_defines})
+endif()
 
+if(BUILD_FUNCTION_SOURCE)
 add_executable(function_source
     gen/function_source.c
 )
@@ -324,6 +340,7 @@ add_qjs_libc_if_needed(function_source)
 target_include_directories(function_source PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(function_source PRIVATE ${qjs_defines})
 target_link_libraries(function_source qjs)
+endif()
 
 # Examples
 #
@@ -379,33 +396,36 @@ if(BUILD_EXAMPLES)
     target_link_libraries(test_fib qjs)
 endif()
 
+if(BUILD_TEST_CONV)
 add_executable(test_conv
     tests/test_conv.c
 )
+endif()
 
 # Install target
 #
 
-if(NOT IOS)
-    file(STRINGS quickjs.h quickjs_h REGEX QJS_VERSION)
-    string(REGEX MATCHALL "([0-9])" QJS_VERSION "${quickjs_h}")
-    list(GET QJS_VERSION 0 QJS_VERSION_MAJOR)
-    list(GET QJS_VERSION 1 QJS_VERSION_MINOR)
-    list(GET QJS_VERSION 2 QJS_VERSION_PATCH)
-    set_target_properties(qjs PROPERTIES
-        VERSION ${QJS_VERSION_MAJOR}.${QJS_VERSION_MINOR}.${QJS_VERSION_PATCH}
-        SOVERSION ${QJS_VERSION_MAJOR}
-    )
-    install(FILES quickjs.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-    if(BUILD_QJS_LIBC)
-        install(FILES quickjs-libc.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-    endif()
-    install(TARGETS qjs_exe RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(TARGETS qjs EXPORT qjsConfig
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(EXPORT qjsConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quickjs)
-    install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DOCDIR})
-    install(DIRECTORY examples DESTINATION ${CMAKE_INSTALL_DOCDIR})
-endif()
+
+# if(NOT IOS)
+#     file(STRINGS quickjs.h quickjs_h REGEX QJS_VERSION)
+#     string(REGEX MATCHALL "([0-9])" QJS_VERSION "${quickjs_h}")
+#     list(GET QJS_VERSION 0 QJS_VERSION_MAJOR)
+#     list(GET QJS_VERSION 1 QJS_VERSION_MINOR)
+#     list(GET QJS_VERSION 2 QJS_VERSION_PATCH)
+#     set_target_properties(qjs PROPERTIES
+#         VERSION ${QJS_VERSION_MAJOR}.${QJS_VERSION_MINOR}.${QJS_VERSION_PATCH}
+#         SOVERSION ${QJS_VERSION_MAJOR}
+#     )
+#     install(FILES quickjs.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+#     if(BUILD_QJS_LIBC)
+#         install(FILES quickjs-libc.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+#     endif()
+#     install(TARGETS qjs_exe RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+#     install(TARGETS qjs EXPORT qjsConfig
+#             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+#     install(EXPORT qjsConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quickjs)
+#     install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DOCDIR})
+#     install(DIRECTORY examples DESTINATION ${CMAKE_INSTALL_DOCDIR})
+# endif()
