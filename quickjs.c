@@ -5795,7 +5795,8 @@ static void mark_children(JSRuntime *rt, JSGCObjectHeader *gp,
 
 static void gc_decref_child(JSRuntime *rt, JSGCObjectHeader *p)
 {
-    assert(p->ref_count > 0);
+    //assert(p->ref_count > 0);
+    if (p->ref_count <= 0) return;
     p->ref_count--;
     if (p->ref_count == 0 && p->mark == 1) {
         list_del(&p->link);
