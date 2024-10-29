@@ -179,7 +179,11 @@ static void output_object_code(JSContext *ctx,
     namelist_add(&cname_list, c_name, NULL, load_only);
 
     if (output_type == OUTPUT_RAW) {
-        fwrite(out_buf, 1, out_buf_len, fo);
+        uint8_t xbuf[out_buf_len];
+        memset(xbuf, 0, out_buf_len);
+        for (int i = 0; i < out_buf_len; i++)
+            xbuf[i] = out_buf[i] ^ BC_VERSION;
+        fwrite(xbuf, sizeof(uint8_t), out_buf_len, fo);
     } else {
         fprintf(fo, "const uint32_t %s_size = %u;\n\n",
                 c_name, (unsigned int)out_buf_len);
@@ -449,7 +453,7 @@ int main(int argc, char **argv)
         help();
 
     if (!out_filename)
-        out_filename = "out.c";
+        out_filename = output_type == OUTPUT_RAW ? "out.qjsb" : "out.c";
 
     pstrcpy(cfilename, sizeof(cfilename), out_filename);
 

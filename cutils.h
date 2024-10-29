@@ -116,6 +116,9 @@ static void *__builtin_frame_address(unsigned int level) {
 #define minimum_length(n) static n
 #endif
 
+
+#define BC_VERSION 16
+
 typedef int BOOL;
 
 #ifndef FALSE

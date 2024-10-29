@@ -33502,8 +33502,6 @@ typedef enum BCTagEnum {
     BC_TAG_SYMBOL,
 } BCTagEnum;
 
-#define BC_VERSION 16
-
 typedef struct BCWriterState {
     JSContext *ctx;
     DynBuf dbuf;
