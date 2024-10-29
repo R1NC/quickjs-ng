@@ -4194,6 +4194,7 @@ bool js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,
         exception:
             js_std_dump_error(ctx);
             //exit(1);
+            JS_FreeValue(ctx, val);
             return false;
         }
         JS_FreeValue(ctx, val);
