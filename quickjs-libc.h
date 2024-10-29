@@ -48,7 +48,7 @@ int js_module_set_import_meta(JSContext *ctx, JSValue func_val,
                               JS_BOOL use_realpath, JS_BOOL is_main);
 JSModuleDef *js_module_loader(JSContext *ctx,
                               const char *module_name, void *opaque);
-void js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,
+bool js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,
                         int flags);
 void js_std_promise_rejection_tracker(JSContext *ctx, JSValue promise,
                                       JSValue reason,
