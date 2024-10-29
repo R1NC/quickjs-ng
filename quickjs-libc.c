@@ -4175,11 +4175,10 @@ bool js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,
     if (JS_IsException(obj))
         goto exception;
     if (load_only) {
-        int ret;
         if (JS_VALUE_GET_TAG(obj) == JS_TAG_MODULE) {
-            ret = js_module_set_import_meta(ctx, obj, FALSE, FALSE);
+            return js_module_set_import_meta(ctx, obj, FALSE, FALSE) == 0;
         }
-        return ret == 0;
+        return false;
     } else {
         if (JS_VALUE_GET_TAG(obj) == JS_TAG_MODULE) {
             if (JS_ResolveModule(ctx, obj) < 0) {
