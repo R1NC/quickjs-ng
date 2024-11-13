@@ -293,8 +293,8 @@ static void compile_file(JSContext *ctx, FILE *fo,
     }
     eval_flags = JS_EVAL_FLAG_COMPILE_ONLY;
     if (module < 0) {
-        module = (has_suffix(filename, ".mjs") ||
-                  JS_DetectModule((const char *)buf, buf_len));
+        module = (has_suffix(filename, ".mjs")/* ||
+                  JS_DetectModule((const char *)buf, buf_len)*/);
     }
     if (module)
         eval_flags |= JS_EVAL_TYPE_MODULE;
