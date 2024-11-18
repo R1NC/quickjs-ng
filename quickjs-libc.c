@@ -4123,6 +4123,42 @@ done:
     return ts->exc;
 }
 
+JSValue js_std_loop_promise(JSContext *ctx)
+{
+    JSRuntime *rt = JS_GetRuntime(ctx);
+    JSThreadState *ts = JS_GetRuntimeOpaque(rt);
+    JSContext *ctx1;
+    int err;
+    /* execute the pending jobs */
+    for(;;) {
+        if (!ts->can_js_os_poll)
+            break;
+        err = JS_ExecutePendingJob(JS_GetRuntime(ctx), &ctx1);
+        if (err <= 0) {
+            if (err < 0) {
+                ts->exc = JS_GetException(ctx1);
+                goto done;
+            }
+            break;
+        }
+    }
+done:
+    return ts->exc;
+}
+
+JSValue js_std_loop_timer(JSContext *ctx)
+{
+    JSRuntime *rt = JS_GetRuntime(ctx);
+    JSThreadState *ts = JS_GetRuntimeOpaque(rt);
+    /* execute the pending timers */
+    for(;;) {
+        if (!ts->can_js_os_poll)
+            break;
+        js_os_poll(ctx);
+    }
+    return ts->exc;
+}
+
 void js_std_loop_cancel(JSRuntime *rt)
 {
     JSThreadState *ts = JS_GetRuntimeOpaque(rt);
