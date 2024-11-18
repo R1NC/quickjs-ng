@@ -38,6 +38,7 @@ JSModuleDef *js_init_module_os(JSContext *ctx, const char *module_name);
 JSModuleDef *js_init_module_bjson(JSContext *ctx, const char *module_name);
 void js_std_add_helpers(JSContext *ctx, int argc, char **argv);
 JSValue js_std_loop(JSContext *ctx);
+void js_std_loop_cancel(JSRuntime *rt);
 JSValue js_std_await(JSContext *ctx, JSValue obj);
 void js_std_init_handlers(JSRuntime *rt);
 void js_std_free_handlers(JSRuntime *rt);

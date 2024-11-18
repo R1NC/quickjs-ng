@@ -4123,6 +4123,12 @@ done:
     return ts->exc;
 }
 
+void js_std_loop_cancel(JSRuntime *rt)
+{
+    JSThreadState *ts = JS_GetRuntimeOpaque(rt);
+    ts->can_js_os_poll = false;
+}
+
 /* Wait for a promise and execute pending jobs while waiting for
    it. Return the promise result or JS_EXCEPTION in case of promise
    rejection. */
