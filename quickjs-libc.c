@@ -4139,11 +4139,8 @@ JSValue js_std_loop_timer(JSContext *ctx)
     JSRuntime *rt = JS_GetRuntime(ctx);
     JSThreadState *ts = JS_GetRuntimeOpaque(rt);
     /* execute the pending timers */
-    for(;;) {
-        if (!ts->can_js_os_poll || list_empty(&ts->os_timers))
-            break;
+    if (ts->can_js_os_poll && !list_empty(&ts->os_timers))
         js_os_poll(ctx);
-    }
     return ts->exc;
 }
 
