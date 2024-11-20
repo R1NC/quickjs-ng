@@ -94,6 +94,8 @@ extern char **environ;
 #include "list.h"
 #include "quickjs-libc.h"
 
+#define MAX_TIMER_DELAY 1
+
 #define MAX_SAFE_INTEGER (((int64_t) 1 << 53) - 1)
 
 #ifndef QJS_NATIVE_MODULE_SUFFIX
@@ -2256,7 +2258,8 @@ static int js_os_run_timers(JSRuntime *rt, JSContext *ctx, JSThreadState *ts, in
         th = list_entry(el, JSOSTimer, link);
         delay = th->timeout - cur_time;
         if (delay > 0) {
-            *min_delay = min_int(*min_delay, delay);
+            /// Can not use the Timer timeout directly, or the `select()` will block the event loop!!!
+            *min_delay = min_int(min_int(*min_delay, delay), MAX_TIMER_DELAY);
         } else {
             *min_delay = 0;
             func = JS_DupValueRT(rt, th->func);
