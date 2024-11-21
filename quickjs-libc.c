@@ -4142,7 +4142,7 @@ JSValue js_std_loop_timer(JSContext *ctx)
     JSRuntime *rt = JS_GetRuntime(ctx);
     JSThreadState *ts = JS_GetRuntimeOpaque(rt);
     /* execute the pending timers */
-    if (ts->can_js_os_poll && !list_empty(&ts->os_timers))
+    if (ts->can_js_os_poll)
         js_os_poll(ctx);
     return ts->exc;
 }
@@ -4156,7 +4156,7 @@ void js_std_loop_cancel(JSRuntime *rt)
 /* Wait for a promise and execute pending jobs while waiting for
    it. Return the promise result or JS_EXCEPTION in case of promise
    rejection. */
-JSValue js_std_await(JSContext *ctx, JSValue obj)
+JSValue js_std_await_do(JSContext *ctx, JSValue obj, bool forceLoop)
 {
     JSRuntime *rt = JS_GetRuntime(ctx);
     JSThreadState *ts = JS_GetRuntimeOpaque(rt);
@@ -4174,6 +4174,8 @@ JSValue js_std_await(JSContext *ctx, JSValue obj)
             JS_FreeValue(ctx, obj);
             break;
         } else if (state == JS_PROMISE_PENDING) {
+            if (!forceLoop)
+                continue;
             JSContext *ctx1;
             int err;
             err = JS_ExecutePendingJob(JS_GetRuntime(ctx), &ctx1);
@@ -4189,6 +4191,16 @@ JSValue js_std_await(JSContext *ctx, JSValue obj)
         }
     }
     return ret;
+}
+
+JSValue js_std_await(JSContext *ctx, JSValue obj)
+{
+    return js_std_await_do(ctx, obj, true);
+}
+
+JSValue js_std_await_fix(JSContext *ctx, JSValue obj)
+{
+    return js_std_await_do(ctx, obj, false);
 }
 
 bool js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,

@@ -42,6 +42,7 @@ JSValue js_std_loop_promise(JSContext *ctx);
 JSValue js_std_loop_timer(JSContext *ctx);
 void js_std_loop_cancel(JSRuntime *rt);
 JSValue js_std_await(JSContext *ctx, JSValue obj);
+JSValue js_std_await_fix(JSContext *ctx, JSValue obj);
 void js_std_init_handlers(JSRuntime *rt);
 void js_std_free_handlers(JSRuntime *rt);
 void js_std_dump_error(JSContext *ctx);
