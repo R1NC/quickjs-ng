@@ -136,9 +136,6 @@ xoption(CONFIG_UBSAN "Enable UndefinedBehaviorSanitizer (UBSan)" OFF)
 
 if(CONFIG_ASAN)
 message(STATUS "Building with ASan")
-add_compile_definitions(
-    __ASAN__=1
-)
 add_compile_options(
     -fsanitize=address
     -fno-sanitize-recover=all
@@ -181,6 +178,7 @@ endif()
 
 if(CONFIG_UBSAN)
 message(STATUS "Building with UBSan")
+# __has_feature(undefined_sanitizer) or __SANITIZE_UNDEFINED__ don't exist
 add_compile_definitions(
     __UBSAN__=1
 )
@@ -307,23 +305,13 @@ endif()
 
 # Test262 runner
 #
-
-if(BUILD_TEST_262)
-if(EMSCRIPTEN
-OR CMAKE_C_COMPILER_ID STREQUAL "TinyCC"
-OR (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_C_COMPILER_VERSION VERSION_LESS 5))
-    # Empty. run-test262 uses pthreads, sorry Windows users.
-    # tcc and gcc 4.8 don't understand _Thread_local, whereas I
-    # don't understand why people still use 4.8 in this day and age
-    # but hey, here we are.
-else()
+if(NOT EMSCRIPTEN)
     add_executable(run-test262
         run-test262.c
     )
     add_qjs_libc_if_needed(run-test262)
     target_compile_definitions(run-test262 PRIVATE ${qjs_defines})
     target_link_libraries(run-test262 qjs)
-endif()
 endif()
 
 # Unicode generator

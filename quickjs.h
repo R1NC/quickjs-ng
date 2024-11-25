@@ -755,7 +755,8 @@ JS_EXTERN int JS_DefinePropertyValueStr(JSContext *ctx, JSValue this_obj,
 JS_EXTERN int JS_DefinePropertyGetSet(JSContext *ctx, JSValue this_obj,
                                       JSAtom prop, JSValue getter, JSValue setter,
                                       int flags);
-JS_EXTERN void JS_SetOpaque(JSValue obj, void *opaque);
+/* Only supported for custom classes, returns 0 on success < 0 otherwise. */
+JS_EXTERN int JS_SetOpaque(JSValue obj, void *opaque);
 JS_EXTERN void *JS_GetOpaque(JSValue obj, JSClassID class_id);
 JS_EXTERN void *JS_GetOpaque2(JSContext *ctx, JSValue obj, JSClassID class_id);
 JS_EXTERN void *JS_GetAnyOpaque(JSValue obj, JSClassID *class_id);
@@ -969,6 +970,7 @@ typedef struct JSCFunctionListEntry {
         const char *str;    /* pure ASCII or UTF-8 encoded */
         int32_t i32;
         int64_t i64;
+        uint64_t u64;
         double f64;
     } u;
 } JSCFunctionListEntry;
@@ -997,6 +999,7 @@ typedef struct JSCFunctionListEntry {
 #define JS_PROP_INT32_DEF(name, val, prop_flags) { name, prop_flags, JS_DEF_PROP_INT32, 0, { .i32 = val } }
 #define JS_PROP_INT64_DEF(name, val, prop_flags) { name, prop_flags, JS_DEF_PROP_INT64, 0, { .i64 = val } }
 #define JS_PROP_DOUBLE_DEF(name, val, prop_flags) { name, prop_flags, JS_DEF_PROP_DOUBLE, 0, { .f64 = val } }
+#define JS_PROP_U2D_DEF(name, val, prop_flags) { name, prop_flags, JS_DEF_PROP_DOUBLE, 0, { .u64 = val } }
 #define JS_PROP_UNDEFINED_DEF(name, prop_flags) { name, prop_flags, JS_DEF_PROP_UNDEFINED, 0, { .i32 = 0 } }
 #define JS_OBJECT_DEF(name, tab, len, prop_flags) { name, prop_flags, JS_DEF_OBJECT, 0, { .prop_list = { tab, len } } }
 #define JS_ALIAS_DEF(name, from) { name, JS_PROP_WRITABLE | JS_PROP_CONFIGURABLE, JS_DEF_ALIAS, 0, { .alias = { from, -1 } } }
@@ -1025,11 +1028,14 @@ JS_EXTERN int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
 /* Version */
 
 #define QJS_VERSION_MAJOR 0
-#define QJS_VERSION_MINOR 6
-#define QJS_VERSION_PATCH 1
+#define QJS_VERSION_MINOR 7
+#define QJS_VERSION_PATCH 0
 #define QJS_VERSION_SUFFIX ""
 
 JS_EXTERN const char* JS_GetVersion(void);
+
+/* Integration point for quickjs-libc.c, not for public use. */
+JS_EXTERN uintptr_t js_std_cmd(int cmd, ...);
 
 #undef JS_EXTERN
 #undef js_force_inline
