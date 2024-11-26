@@ -4213,8 +4213,6 @@ JSValue js_std_await(JSContext *ctx, JSValue obj)
             JS_FreeValue(ctx, obj);
             break;
         } else if (state == JS_PROMISE_PENDING) {
-            if (!forceLoop)
-                continue;
             JSContext *ctx1;
             int err;
             err = JS_ExecutePendingJob(JS_GetRuntime(ctx), &ctx1);
