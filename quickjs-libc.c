@@ -4195,7 +4195,7 @@ void js_std_loop_cancel(JSRuntime *rt)
 /* Wait for a promise and execute pending jobs while waiting for
    it. Return the promise result or JS_EXCEPTION in case of promise
    rejection. */
-JSValue js_std_await_do(JSContext *ctx, JSValue obj, bool forceLoop)
+JSValue js_std_await(JSContext *ctx, JSValue obj)
 {
     JSRuntime *rt = JS_GetRuntime(ctx);
     JSThreadState *ts = js_get_thread_state(rt);
@@ -4230,16 +4230,6 @@ JSValue js_std_await_do(JSContext *ctx, JSValue obj, bool forceLoop)
         }
     }
     return ret;
-}
-
-JSValue js_std_await(JSContext *ctx, JSValue obj)
-{
-    return js_std_await_do(ctx, obj, true);
-}
-
-JSValue js_std_await_fix(JSContext *ctx, JSValue obj)
-{
-    return js_std_await_do(ctx, obj, false);
 }
 
 bool js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,
