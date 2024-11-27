@@ -4168,7 +4168,7 @@ done:
 JSValue js_std_loop_promise(JSContext *ctx)
 {
     JSRuntime *rt = JS_GetRuntime(ctx);
-    JSThreadState *ts = JS_GetRuntimeOpaque(rt);
+    JSThreadState *ts = js_get_thread_state(rt);
     JSContext *ctx1;
     /* execute the pending jobs */
     if (ts->can_js_os_poll)
@@ -4179,7 +4179,7 @@ JSValue js_std_loop_promise(JSContext *ctx)
 JSValue js_std_loop_timer(JSContext *ctx)
 {
     JSRuntime *rt = JS_GetRuntime(ctx);
-    JSThreadState *ts = JS_GetRuntimeOpaque(rt);
+    JSThreadState *ts = js_get_thread_state(rt);
     /* execute the pending timers */
     if (ts->can_js_os_poll)
         js_os_poll(ctx);
