@@ -305,14 +305,14 @@ endif()
 
 # Test262 runner
 #
-if(NOT EMSCRIPTEN)
-    add_executable(run-test262
-        run-test262.c
-    )
-    add_qjs_libc_if_needed(run-test262)
-    target_compile_definitions(run-test262 PRIVATE ${qjs_defines})
-    target_link_libraries(run-test262 qjs)
-endif()
+# if(NOT EMSCRIPTEN)
+#     add_executable(run-test262
+#         run-test262.c
+#     )
+#     add_qjs_libc_if_needed(run-test262)
+#     target_compile_definitions(run-test262 PRIVATE ${qjs_defines})
+#     target_link_libraries(run-test262 qjs)
+# endif()
 
 # Unicode generator
 #
