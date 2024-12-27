@@ -1778,9 +1778,14 @@ static inline uintptr_t js_get_stack_pointer(void)
 
 static inline BOOL js_check_stack_overflow(JSRuntime *rt, size_t alloca_size)
 {
+//FIXME: Nested call between Android JNI and JS will make the stack frame address 'strange' !!
+#if defined(__ANDROID__)
+    return false;
+#else
     uintptr_t sp;
     sp = js_get_stack_pointer() - alloca_size;
     return unlikely(sp < rt->stack_limit);
+#endif
 }
 
 JSRuntime *JS_NewRuntime2(const JSMallocFunctions *mf, void *opaque)
