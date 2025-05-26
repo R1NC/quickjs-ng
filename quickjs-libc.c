@@ -4235,11 +4235,16 @@ bool js_std_eval_binary(JSContext *ctx, const uint8_t *buf, size_t buf_len,
 {
     JSValue obj, val;
     
-    uint8_t xbuf[buf_len];
+    uint8_t *xbuf = (uint8_t *)malloc(buf_len);
+    if (!xbuf)
+        return false;
+        
     memset(xbuf, 0, buf_len);
     for (int i = 0; i < buf_len; i++)
         xbuf[i] = buf[i] ^ BC_VERSION;
     obj = JS_ReadObject(ctx, xbuf, buf_len, JS_READ_OBJ_BYTECODE);
+
+    free(xbuf);
 
     if (JS_IsException(obj))
         goto exception;
