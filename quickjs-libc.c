@@ -3000,6 +3000,17 @@ static int my_execvpe(const char *filename, char **argv, char **envp)
     return -1;
 }
 
+#ifdef __EMSCRIPTEN__
+typedef int js_once_t;
+#define JS_ONCE_INIT 0
+static inline void js_once(js_once_t *once_control, void (*init_routine)(void)) {
+    if (*once_control == 0) {
+        *once_control = 1;
+        init_routine();
+    }
+}
+#endif
+
 static js_once_t js_os_exec_once = JS_ONCE_INIT;
 
 static void (*js_os_exec_closefrom)(int);

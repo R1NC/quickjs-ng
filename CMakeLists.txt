@@ -238,7 +238,8 @@ target_include_directories(qjs PUBLIC
 target_link_libraries(qjs PUBLIC ${qjs_libs})
 
 if(EMSCRIPTEN)
-    add_executable(qjs_wasm ${qjs_sources})
+    #add_executable(qjs_wasm ${qjs_sources})
+    add_library(qjs_wasm STATIC ${qjs_sources})
     target_link_options(qjs_wasm PRIVATE
         # in emscripten 3.x, this will be set to 16k which is too small for quickjs. #write sth. to force github rebuild
         -sSTACK_SIZE=2097152 # let it be 2m = 2 * 1024 * 1024 = 2097152, otherwise, stack overflow may be occured at bootstrap
